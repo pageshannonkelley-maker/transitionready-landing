@@ -128,14 +128,86 @@
   </section>
 
 <section style="padding: 60px 20px; background: #fff; text-align: center;">
-    <h2 style="font-size: 32px; color: #1a1a2e; margin-bottom: 12px;">Contact Us</h2>
-    <p style="color: #666; font-size: 16px; margin-bottom: 32px;">Have questions? We'd love to hear from you.</p>
-    <a href="mailto:customerservice@transitionready.online" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #1976D2, #42A5F5); color: #fff; border-radius: 12px; font-size: 18px; font-weight: bold; text-decoration: none;">
-      📧 Contact TransitionReady
-    </a>
-    <p style="color: #666; font-size: 14px; margin-top: 16px;">Or email us directly at: <strong>customerservice@transitionready.online</strong></p>
-    <p style="color: #999; font-size: 14px; margin-top: 12px;">We typically respond within 24 hours.</p>
-  </section>
+  <h2 style="font-size: 32px; color: #1a1a2e; margin-bottom: 12px;">Contact Us</h2>
+  <p style="color: #666; font-size: 16px; margin-bottom: 32px;">Have questions? We'd love to hear from you.</p>
+
+  <form id="contact-form" style="max-width: 480px; margin: 0 auto; text-align: left;">
+    <div style="margin-bottom: 16px;">
+      <label for="contact-name" style="display: block; margin-bottom: 6px; font-size: 14px; color: #444;">Name</label>
+      <input type="text" id="contact-name" name="name" required
+        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px;" />
+    </div>
+    <div style="margin-bottom: 16px;">
+      <label for="contact-email" style="display: block; margin-bottom: 6px; font-size: 14px; color: #444;">Email</label>
+      <input type="email" id="contact-email" name="email" required
+        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px;" />
+    </div>
+    <div style="margin-bottom: 24px;">
+      <label for="contact-message" style="display: block; margin-bottom: 6px; font-size: 14px; color: #444;">Message</label>
+      <textarea id="contact-message" name="message" rows="5" required
+        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px;"></textarea>
+    </div>
+    <p id="contact-error" style="color: #c0392b; display: none; margin-bottom: 16px;">Something went wrong. Please try again or email us directly at customerservice@transitionready.online.</p>
+    <button type="submit" id="contact-submit-btn"
+      style="width: 100%; padding: 16px; background: linear-gradient(135deg, #1976D2, #42A5F5); color: #fff; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">
+      Send Message
+    </button>
+  </form>
+
+  <div id="contact-success" style="display: none;">
+    <h3 style="font-size: 24px; color: #1a1a2e; margin-bottom: 8px;">Thank you!</h3>
+    <p style="color: #666; font-size: 16px;">We've received your message and typically respond within 24 hours.</p>
+  </div>
+</section>
+
+<script>
+  document.getElementById('contact-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const submitBtn = document.getElementById('contact-submit-btn');
+    const errorMsg = document.getElementById('contact-error');
+
+    errorMsg.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    const payload = {
+      name: document.getElementById('contact-name').value,
+      email: document.getElementById('contact-email').value,
+      message: document.getElementById('contact-message').value,
+    };
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        form.style.display = 'none';
+        document.getElementById('contact-success').style.display = 'block';
+
+        if (typeof gtag === 'function') {
+          gtag('event', 'claude_lead_captured', {
+            event_category: 'contact_form',
+            event_label: 'landing_page_contact_form',
+          });
+        }
+      } else {
+        errorMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      }
+    } catch (err) {
+      errorMsg.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+    }
+  });
+</script>
 
   <footer>
     <p>© 2026 TransitionReady — A Ready Learning LLC Product</p>
