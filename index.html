@@ -218,6 +218,120 @@
       <a href="#contact-form">Contact</a>
     </p>
   </footer>
+<!-- Richard Chat Widget — add this right before the closing </body> tag on the landing page -->
 
+<div id="richard-launcher" style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #1976D2, #42A5F5); display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; transition: transform 0.2s;">
+  👨‍🏫
+</div>
+
+<div id="richard-chat-window" style="display: none; position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: calc(100vw - 48px); height: 460px; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; flex-direction: column; overflow: hidden; font-family: 'Georgia', serif;">
+
+  <div style="background: #1a1a2e; color: #fff; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 22px;">👨‍🏫</span>
+      <div>
+        <div style="font-weight: bold; font-size: 15px;">Richard</div>
+        <div style="font-size: 11px; color: #90CAF9;">TransitionReady Assistant</div>
+      </div>
+    </div>
+    <span id="richard-close-btn" style="cursor: pointer; font-size: 20px; line-height: 1;">&times;</span>
+  </div>
+
+  <div id="richard-messages" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #F8F9FA;">
+    <div style="align-self: flex-start; background: #fff; border-radius: 12px; padding: 10px 14px; max-width: 80%; font-size: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+      Hi! I'm Richard 👋 I can answer questions about TransitionReady — pricing, how it works, or whether it's a good fit for your classroom. What can I help with?
+    </div>
+  </div>
+
+  <div style="padding: 12px; border-top: 1px solid #eee; display: flex; gap: 8px;">
+    <input id="richard-input" type="text" placeholder="Type a message..." style="flex: 1; padding: 10px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; outline: none;" />
+    <button id="richard-send-btn" style="background: linear-gradient(135deg, #1976D2, #42A5F5); color: #fff; border: none; border-radius: 20px; padding: 10px 18px; font-size: 14px; font-weight: bold; cursor: pointer;">Send</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const launcher = document.getElementById('richard-launcher');
+  const chatWindow = document.getElementById('richard-chat-window');
+  const closeBtn = document.getElementById('richard-close-btn');
+  const messagesEl = document.getElementById('richard-messages');
+  const input = document.getElementById('richard-input');
+  const sendBtn = document.getElementById('richard-send-btn');
+
+  let conversation = [];
+  let isOpen = false;
+
+  function toggleChat() {
+    isOpen = !isOpen;
+    chatWindow.style.display = isOpen ? 'flex' : 'none';
+    if (isOpen) input.focus();
+  }
+
+  launcher.addEventListener('click', toggleChat);
+  closeBtn.addEventListener('click', toggleChat);
+
+  function addMessage(text, sender) {
+    const bubble = document.createElement('div');
+    bubble.style.alignSelf = sender === 'user' ? 'flex-end' : 'flex-start';
+    bubble.style.background = sender === 'user' ? 'linear-gradient(135deg, #1976D2, #42A5F5)' : '#fff';
+    bubble.style.color = sender === 'user' ? '#fff' : '#333';
+    bubble.style.borderRadius = '12px';
+    bubble.style.padding = '10px 14px';
+    bubble.style.maxWidth = '80%';
+    bubble.style.fontSize = '14px';
+    bubble.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
+    bubble.textContent = text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    conversation.push({ role: 'user', content: text });
+    input.value = '';
+    sendBtn.disabled = true;
+
+    const typingBubble = document.createElement('div');
+    typingBubble.id = 'richard-typing';
+    typingBubble.style.alignSelf = 'flex-start';
+    typingBubble.style.fontSize = '13px';
+    typingBubble.style.color = '#999';
+    typingBubble.textContent = 'Richard is typing...';
+    messagesEl.appendChild(typingBubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    try {
+      const response = await fetch('/api/richard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversation }),
+      });
+      const data = await response.json();
+
+      document.getElementById('richard-typing')?.remove();
+
+      if (data.reply) {
+        addMessage(data.reply, 'richard');
+        conversation.push({ role: 'assistant', content: data.reply });
+      } else {
+        addMessage("Sorry, something went wrong on my end. Please try again in a moment.", 'richard');
+      }
+    } catch (err) {
+      document.getElementById('richard-typing')?.remove();
+      addMessage("Sorry, something went wrong on my end. Please try again in a moment.", 'richard');
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+})();
+</script>
 </body>
 </html>
