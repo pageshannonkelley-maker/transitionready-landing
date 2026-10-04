@@ -55,6 +55,15 @@
     footer { background: #1a1a2e; color: #90A4AE; text-align: center; padding: 32px 20px; font-size: 14px; }
     footer a { color: #90A4AE; text-decoration: none; margin: 0 8px; }
     footer a:hover { color: #fff; }
+    .richard-launcher { position: fixed; bottom: 112px; right: 24px; min-width: 60px; height: 60px; border-radius: 999px; background: linear-gradient(135deg, #1976D2, #42A5F5); display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px 0 14px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 22px rgba(0,0,0,0.3); z-index: 9999; transition: transform 0.2s; }
+    .richard-launcher:hover { transform: translateY(-2px); }
+    .richard-launcher-icon { font-size: 28px; line-height: 1; }
+    .richard-chat-window { display: none; position: fixed; bottom: 184px; right: 24px; width: 340px; max-width: calc(100vw - 48px); height: min(460px, calc(100vh - 220px)); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; flex-direction: column; overflow: hidden; font-family: 'Georgia', serif; }
+    @media (max-width: 600px) {
+      .richard-launcher { bottom: 88px; right: 16px; height: 54px; padding: 0 14px 0 12px; font-size: 14px; }
+      .richard-launcher-icon { font-size: 24px; }
+      .richard-chat-window { bottom: 154px; right: 16px; max-width: calc(100vw - 32px); height: min(430px, calc(100vh - 190px)); }
+    }
   </style>
 </head>
 <body>
@@ -220,11 +229,12 @@
   </footer>
 <!-- Richard Chat Widget — add this right before the closing </body> tag on the landing page -->
 
-<div id="richard-launcher" style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #1976D2, #42A5F5); display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; transition: transform 0.2s;">
-  👨‍🏫
+<div id="richard-launcher" class="richard-launcher" aria-label="Chat with Richard">
+  <span class="richard-launcher-icon" aria-hidden="true">👨‍🏫</span>
+  <span>Chat with Richard</span>
 </div>
 
-<div id="richard-chat-window" style="display: none; position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: calc(100vw - 48px); height: 460px; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; flex-direction: column; overflow: hidden; font-family: 'Georgia', serif;">
+<div id="richard-chat-window" class="richard-chat-window">
 
   <div style="background: #1a1a2e; color: #fff; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
     <div style="display: flex; align-items: center; gap: 10px;">
