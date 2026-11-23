@@ -22,7 +22,7 @@ jobs:
           # 2 — exchange it for an Anthropic access token
             curl -sS https://api.anthropic.com/v1/oauth/token \
             -H "content-type: application/json" \
-            --data @- <<JSON | jq 'with_entries(if (.key | test("token$")) then .value = "<redacted>" else . end)'
+            --data @- <<-JSON | jq 'with_entries(if (.key | test("token$")) then .value = "<redacted>" else . end)'
             {
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
             "assertion": "$JWT",
@@ -31,4 +31,4 @@ jobs:
             "service_account_id": "svac_01WxuaHV1QgQYGa7Gs8UoZ8U",
             "workspace_id": "wrkspc_01LD4kzhXBk6o8wwub2igvjf"
               }
-            JSON
+              JSON
